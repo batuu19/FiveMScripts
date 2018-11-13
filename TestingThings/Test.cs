@@ -87,17 +87,9 @@ namespace TestingThings
         }
         private void SetWantedLevel(int source, List<object> args, string raw)
         {
-            try
-            {
-                int level = (int)args[0];
-                ShowChatNotification($"level {level}");
-                Function.Call(Hash.SET_PLAYER_WANTED_LEVEL, Game.Player.Handle, level, false);
-
-            }
-            catch (Exception e)
-            {
-                ShowChatNotification($"Exception in wanted: {e}");
-            }
+            int level = int.Parse((string)args[0]);
+            ShowChatNotification($"level {level}");
+            Function.Call(Hash.SET_PLAYER_WANTED_LEVEL, Game.Player.Handle, level, false);
         }
         #endregion
     }
