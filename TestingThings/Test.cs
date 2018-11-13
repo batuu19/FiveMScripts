@@ -13,7 +13,7 @@ namespace TestingThings
     public class Test : BaseScript
     {
         private float forceMultipier = 50f;
-        
+        private bool jumper = false;
 
         public Test()
         {
@@ -27,6 +27,8 @@ namespace TestingThings
             {
                 Debug.WriteLine($"Error in jumper constructor: {e}");
             }
+            //not working here
+            //Game.PlayerPed.IsCollisionProof = true;
         }
 
 
@@ -35,18 +37,19 @@ namespace TestingThings
             try
             {
                 var player = Game.PlayerPed;
-                if(Game.IsControlJustPressed(0,Control.Jump))
+                if(Game.IsControlJustPressed(0,Control.Jump) && jumper)
                 {
                     player.ApplyForce(new Vector3(0,0,forceMultipier));
                     DrawNotification("Force added");
                 }
 
-                player.IsCollisionProof = true;
                 if(player.IsRagdoll)
                 {
                     player.CancelRagdoll();
                 }
-                
+
+                player.IsCollisionProof = true;
+
             }
             catch (Exception e)
             {
@@ -63,17 +66,28 @@ namespace TestingThings
             }
             catch (Exception e)
             {
-                DrawNotification($"Car not created: {e}");
+                DrawNotification($"Command error: {e}");
             }
         }
 
         private async void ExecuteCommand(string command)
         {
             int spaceIndex = command.IndexOf(" ");
-            string commandName = command.Substring(0, spaceIndex);
-            string arg0 = command.Substring(spaceIndex, command.Length - spaceIndex).Trim();
+            string commandName,arg0 = "";
+            if (spaceIndex != -1)
+            {
+                commandName = command.Substring(0, spaceIndex);
+                arg0 = command.Substring(spaceIndex, command.Length - spaceIndex).Trim();
+            }
+            else commandName = command;
             switch (commandName)
             {
+                case "jumper":
+                    {
+                        jumper = !jumper;
+                        DrawNotification("jumper " + (jumper ? "on" : "off"));
+                        break;
+                    }
                 case "car":
                     {
                         Vector3 vehPos = Game.PlayerPed.GetOffsetPosition(new Vector3(0f, 8f, 0.5f));
@@ -93,34 +107,10 @@ namespace TestingThings
 
                         break;
                     }
-                case "summon":
+                case "wanted":
                     {
-                        //string entity = arg0;
-                        //uint entityHash = (uint)API.GetHashKey(entity);
-                        //if(API.IsModelValid(entityHash))API.RequestModel(entityHash);
-                        //else
-                        //{
-                        //    DrawNotification("model not valid");
-                        //    break;
-                        //}
-                        //int i = 0;
-                        //while (++i < 2000 && !API.HasModelLoaded(entityHash))
-                        //    await Delay(1);
-                        //if (i < 2000)
-                        //{
-                        //    API.createModel
-                        //    DrawNotification("Created car");
-                        //}
-                        //else DrawNotification("Could not load entity");
-                        ///not working.......========================================
-                        int count;
-                        int.TryParse(arg0,out count);
-                        if (count > 1) count = 1;
-                        Vector3 vec = Game.PlayerPed.GetOffsetPosition(new Vector3(0f, 8f, 0.5f));
-                        for (int i = 0; i < count; i++)
-                        {
-                            API.CreateRandomPed(vec.X + i, vec.Y, vec.Z);
-                        }
+                        int level = int.Parse(arg0);
+                        Function.Call(Hash.SET_PLAYER_WANTED_LEVEL, Game.Player.Handle, level, false);
                         break;
                     }
                 default:
