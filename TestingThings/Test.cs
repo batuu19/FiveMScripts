@@ -20,6 +20,7 @@ namespace TestingThings
             API.RegisterCommand("jumper", new Action<int, List<object>, string>(ToggleJumper), false);
             API.RegisterCommand("spawn", new Action<int, List<object>, string>(SpawnCar), false);
             API.RegisterCommand("wanted", new Action<int, List<object>, string>(SetWantedLevel), false);
+            API.RegisterCommand("peds", new Action<int, List<object>, string>(SpawnPeds), false);
             Tick += OnTick;
 
         }
@@ -90,6 +91,58 @@ namespace TestingThings
             int level = int.Parse((string)args[0]);
             ShowChatNotification($"level {level}");
             Function.Call(Hash.SET_PLAYER_WANTED_LEVEL, Game.Player.Handle, level, false);
+        }
+        private async void SpawnPeds(int source, List<object> args, string raw)
+        {
+            ShowChatNotification("Start spawn peds");
+            try
+            {
+
+                int pedsCount = 1;
+                pedsCount = int.Parse((string)args[0]);
+                
+
+                if (pedsCount < 0) pedsCount = 1;
+                /*
+                 * Ped types
+                 * Michael = 0
+                 * Franklin = 1
+                 * Trevor = 2
+                 * Army = 29
+                 * Animal = 28
+                 * SWAT = 27
+                 * LSFD = 21
+                 * Paramedic = 20
+                 * Cop = 6
+                 * Male = 4
+                 * Female = 5 
+                 * Human = 26
+                 */
+                Vector3 vec = Game.PlayerPed.GetOffsetPosition(new Vector3(0f, 8f, 0.5f));
+                uint modelHash = (uint)API.GetHashKey("a_m_m_busines_01");
+                //model hash?
+                int i = 0;
+                while (++i < 2000 && !API.HasModelLoaded(modelHash))
+                    await Delay(1);
+                if (i < 2000)
+                {
+                    for (int j = 0; j < pedsCount; j++)
+                    {
+                        //(uint)Game.PlayerPed.Model.Hash
+                        API.CreatePed(26, modelHash, vec.X, vec.Y + j, vec.Z, API.GetEntityHeading(API.PlayerPedId()) + 90, false, false);
+                    }
+                    ShowChatNotification("Spawned peds");
+                }
+                else
+                {
+                    ShowChatNotification("Could not load peds");
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                ShowChatNotification($"peds error: {e}");
+            }
         }
         #endregion
     }
