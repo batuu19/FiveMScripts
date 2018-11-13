@@ -50,11 +50,14 @@ namespace TestingThings
 
                 player.IsCollisionProof = true;
 
+                TriggerEvent("chatMessage", "", new int[] { 0, 0, 0 }, "Hello world");
+                //cały czas pisze to, to źle
             }
             catch (Exception e)
             {
                 DrawNotification($"Jumper error: {e}");
             }
+
         }
 
         private void OnChatMessage(string author, List<object> color, string text)
