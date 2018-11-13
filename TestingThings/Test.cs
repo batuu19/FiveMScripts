@@ -100,7 +100,7 @@ namespace TestingThings
 
                 int pedsCount = 1;
                 pedsCount = int.Parse((string)args[0]);
-                
+
 
                 if (pedsCount < 0) pedsCount = 1;
                 /*
@@ -119,25 +119,11 @@ namespace TestingThings
                  * Human = 26
                  */
                 Vector3 vec = Game.PlayerPed.GetOffsetPosition(new Vector3(0f, 8f, 0.5f));
-                uint modelHash = (uint)API.GetHashKey("a_m_m_busines_01");
-                //model hash?
-                int i = 0;
-                while (++i < 2000 && !API.HasModelLoaded(modelHash))
-                    await Delay(1);
-                if (i < 2000)
+                for (int j = 0; j < pedsCount; j++)
                 {
-                    for (int j = 0; j < pedsCount; j++)
-                    {
-                        //(uint)Game.PlayerPed.Model.Hash
-                        API.CreatePed(26, modelHash, vec.X, vec.Y + j, vec.Z, API.GetEntityHeading(API.PlayerPedId()) + 90, false, false);
-                    }
-                    ShowChatNotification("Spawned peds");
+                    API.CreatePed(26, (uint)Game.PlayerPed.Model.Hash, vec.X, vec.Y + j, vec.Z, API.GetEntityHeading(API.PlayerPedId()) + 90, false, false);
                 }
-                else
-                {
-                    ShowChatNotification("Could not load peds");
-                    return;
-                }
+                ShowChatNotification("Spawned peds");
             }
             catch (Exception e)
             {
